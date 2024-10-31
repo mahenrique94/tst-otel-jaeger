@@ -1,0 +1,44 @@
+services:
+  prometheus:
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    container_name: prometheus
+    image: prom/prometheus
+    networks:
+      - monitoring
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    networks:
+      - monitoring
+    ports:
+      - 9191:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  jaeger:
+    container_name: jaeger
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+    image: jaegertracing/all-in-one
+    networks:
+      - monitoring
+    ports:
+      - 9292:16686
+      - 4317:4317
+      - 4318:4318
+      - 9411:9411
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  grafana-data:
+  prometheus-data:
